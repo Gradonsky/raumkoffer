@@ -1,6 +1,6 @@
 __author__ = 'Faiku Fitim, Janusz Gradonski'
 
-from solarsystem.Texturen import *
+from raum.Texturen import *
 
 
 class Gestirn:

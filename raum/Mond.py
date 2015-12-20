@@ -1,6 +1,6 @@
 __author__ = 'Faiku Fitim, Janusz Gradonski'
 
-from solarsystem.Gestirn import *
+from raum.Gestirn import *
 from math import *
 
 class Mond(Gestirn):

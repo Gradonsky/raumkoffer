@@ -1,8 +1,7 @@
 __author__ = 'Faiku Fitim, Janusz Gradonski'
 
-from solarsystem.Fixstern import *
-from solarsystem.Planet import *
-from solarsystem.Asteroid import *
+from raum.Fixstern import *
+from raum.Planet import *
 from random import *
 
 ESCAPE = '\033'
@@ -24,7 +23,6 @@ class Galaxie():
         self.lights = True
         self.anim = True
         self.zoom = 0
-        self.asteroiden = []
         self.width = width
         self.height = height
 
@@ -41,7 +39,6 @@ class Galaxie():
         self.sonnenTextur = None
         self.uranusTextur = None
         self.venusTextur = None
-        self.asteroidTextur = None
 
     def loadTextures(self):
         """
@@ -58,7 +55,6 @@ class Galaxie():
         self.sonnenTextur = Texturen.LoadTexture("../data/sonne.jpg")
         self.uranusTextur = Texturen.LoadTexture("../data/uranus.jpg")
         self.venusTextur = Texturen.LoadTexture("../data/venus.jpg")
-        self.asteroidTextur = Texturen.LoadTexture("../data/asteroid.jpg")
 
     def pauseAll(self):
         """
@@ -79,22 +75,22 @@ class Galaxie():
         # Parameter(Planet): (position, anim, rotation, rotSpeed, rotPoint, movSpeed, radius, textur, divisions, monde)
         # Parameter(Fixstern): (position, rotSpeed, textur, planeten, anim, licht, radius, divisions)
         # Parameter(Mond): (anim, rotation, rotSpeed, parent, entf_rotPoint, movSpeed, radius, textur, divisions)
-        # Fixstern
+        # Fixstern ist die Sonne
         self.sonne = Fixstern([0, 0, -80], 0.2, self.sonnenTextur, None, True, self.light, 10, 64)
 
         # Planeten
         self.merkur = Planet([-17, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.0001, 0.4, self.merkurTextur, 32, None)
         self.venus = Planet([-20.5, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.000125, 1.21, self.venusTextur, 32, None)
-        self.erde = Planet([-29, 0, -80], True, [90, 0, 0], 1.5, self.sonne.position, 0.0006, 1.28, self.erdenTextur, 32, None)
-        self.mars = Planet([-36.5, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.0009, 0.6, self.marsTextur, 32, None)
-        self.jupiter = Planet([-59, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.00035, 14.3, self.jupiterTextur, 32, None)
-        self.saturn = Planet([-85, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.00056, 12.05, self.saturnTextur, 32, None)
-        self.uranus = Planet([-98, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.0004, 5.11, self.uranusTextur, 32, None)
-        self.neptun = Planet([-115, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.00087, 4.95, self.neptunTextur, 32, None)
-        self.pluto = Planet([-125, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.00025, 0.1, self.plutoTextur, 32, None)
+        self.erde = Planet([-29, 0, -80], True, [90, 0, 0], 0.6, self.sonne.position, 0.00006, 1.28, self.erdenTextur, 32, None)
+        self.mars = Planet([-36.5, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.00009, 0.6, self.marsTextur, 32, None)
+        self.jupiter = Planet([-59, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.000035, 14.3, self.jupiterTextur, 32, None)
+        self.saturn = Planet([-85, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.000056, 12.05, self.saturnTextur, 32, None)
+        self.uranus = Planet([-98, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.00004, 5.11, self.uranusTextur, 32, None)
+        self.neptun = Planet([-115, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.000087, 4.95, self.neptunTextur, 32, None)
+        self.pluto = Planet([-125, 0, -80], True, [90, 0, 0], 0.05, self.sonne.position, 0.000025, 0.1, self.plutoTextur, 32, None)
 
         # Monde
-        self.mond = Mond(True, [-90, 0, -80], 0, self.erde, 5, -0.0005, 0.4, self.mondTextur, 24)
+        self.mond = Mond(True, [-90, 0, -80], 0, self.erde, 5, -0.00005, 0.4, self.mondTextur, 24)
 
         self.erde.addMond(self.mond)
         self.sonne.addPlanet(self.erde)
@@ -106,9 +102,6 @@ class Galaxie():
         self.sonne.addPlanet(self.saturn)
         self.sonne.addPlanet(self.uranus)
         self.sonne.addPlanet(self.venus)
-
-        while len(self.asteroiden) < 100:
-            self.addAsteroid()
 
     def enableTextures(self):
         """
@@ -183,11 +176,6 @@ class Galaxie():
 
         self.sonne.draw(self.pos, self.zoom)
 
-        try:
-            for i in range(0, len(self.asteroiden)):
-                self.asteroiden[i].draw(self.pos, self.zoom)
-        except:
-            pass
 
         glutSwapBuffers()  # zeichnen
 
@@ -198,41 +186,6 @@ class Galaxie():
         """
         self.sonne.update()
 
-        for x in range(0, len(self.asteroiden)):
-            try:
-                if not self.asteroiden[x].valid:
-                    self.asteroiden.pop(x)
-                else:
-                    self.asteroiden[x].update()
-            except:
-                pass
-
-        while len(self.asteroiden) < 100:
-            self.addAsteroid()
-
-    def addAsteroid(self):
-        """
-        asteroidden hinzufuegen
-        :return:
-        """
-        x = randint(-self.width/2, self.width/2)
-        y = randint(-self.width/2, self.height/2)
-        z = randint(-1000, 1000)
-
-        dir_x = randint(1, 7)
-        dir_y = randint(1, 7)
-        dir_z = randint(1, 7)
-
-        speed = randint(-10, 10)
-
-        if speed == 0:
-            speed = 1
-
-        rot_speed = random()
-        radius = randint(0, 5)
-        divisions = randint(8, 32)
-
-        self.asteroiden.append(Asteroid([x,y,z], [dir_x, dir_y, dir_z], speed, rot_speed, self.anim, radius, self.asteroidTextur, divisions))
 
     def keyPressed(self, *args):
         """
@@ -248,11 +201,11 @@ class Galaxie():
                 self.playAll()
                 self.anim = True
 
-        if args[0] == b'c':
+        if args[0] == b'1':
             if self.pos:
                 self.zoom = 0
                 self.pos = False
-            else:
+        if args[0] == b'2':
                 self.zoom = 0
                 self.pos = True
 
@@ -272,10 +225,10 @@ class Galaxie():
                 self.sonne.enableLight()
                 self.lights = True
 
-        if args[0] == b'w':
+        if args[0] == b's':
             self.sonne.animateAllChildrenFaster(0.05, 0.0001)
 
-        if args[0] == b's':
+        if args[0] == b'd':
             self.sonne.animateAllChildrenSlower(0.05, 0.0001)
 
         if args[0] == b'+':
